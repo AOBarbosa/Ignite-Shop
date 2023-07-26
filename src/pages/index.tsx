@@ -34,7 +34,7 @@ export default function Home({ products }: HomeProps) {
 
             <footer>
               <strong>{product.name}</strong>
-              <span>{product.price / 100}</span>
+              <span>{product.price}</span>
             </footer>
           </Product>
         )
@@ -49,13 +49,17 @@ export const getStaticProps: GetStaticProps = async () => {
   })
 
   const products = response.data.map((product) => {
-    const price = (product.default_price as Stripe.Price).unit_amount
+    const price = product.default_price as Stripe.Price
 
     return {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      price,
+      // price: (price.unit_amount as number) / 100,
+      price: new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format((price.unit_amount as number) / 100),
     }
   })
 
